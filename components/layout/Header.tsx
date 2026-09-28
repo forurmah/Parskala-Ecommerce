@@ -1,8 +1,11 @@
+"use client"
 import Link from "next/link";
 import { Search, ShoppingCart, UserRound } from "lucide-react";
-import {Navbar} from "@/components/layout/Navbar";
+import { useCart } from "@/components/cart/CartProvider";
 
 export default function Header() {
+  const { totalCount } = useCart();
+
   return (
     <header className="border-b border-zinc-200 bg-white">
       <div className="bg-zinc-900 px-4 py-2 text-center text-xs text-white sm:text-sm">
@@ -35,7 +38,7 @@ export default function Header() {
               <ShoppingCart size={20} aria-hidden="true" />
 
               <span className="absolute -left-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-600 px-1 text-xs text-white">
-                ۰
+                {totalCount.toLocaleString("fa-IR")}
               </span>
             </button>
           </div>
@@ -80,7 +83,7 @@ export default function Header() {
             <ShoppingCart size={21} aria-hidden="true" />
 
             <span className="absolute -left-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-zinc-900 px-1 text-xs text-white">
-              ۰
+              {totalCount.toLocaleString("fa-IR")}
             </span>
           </button>
         </div>

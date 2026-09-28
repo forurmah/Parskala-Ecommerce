@@ -5,7 +5,9 @@ export type ProductCategory =
 
 export type Product = {
   id: string;
+  slug:string;
   name: string;
+  description: string;
   category: ProductCategory;
   price: number;
   image: string;

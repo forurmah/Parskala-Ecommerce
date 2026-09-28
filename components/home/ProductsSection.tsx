@@ -1,11 +1,12 @@
-import { products } from '@/data/products';
-import ProductCard from '@/components/product/ProductCard';
+import { products } from "@/data/products";
+import ProductCard from "@/components/product/ProductCard";
 
 export default function ProductsSection() {
   return (
     <section
       aria-labelledby="products-heading"
-      className="bg-slate-50 py-16"
+      className="bg-slate-50 py-12 sm:py-16"
+      dir="rtl"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
@@ -21,7 +22,7 @@ export default function ProductsSection() {
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

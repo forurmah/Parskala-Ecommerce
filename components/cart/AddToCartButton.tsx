@@ -1,7 +1,7 @@
 "use client";
-
-import type { Product } from "@/types/product";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/components/cart/CartProvider";
+import type { Product } from "@/types/product";
 
 type AddToCartButtonProps = {
   product: Product;
@@ -11,11 +11,25 @@ export default function AddToCartButton({
   product,
 }: AddToCartButtonProps) {
   const { addToCart } = useCart();
+  const [justAdded, setJustAdded] = useState(false);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+    };
+  }, []);
 
   function handleAddToCart() {
     if (!product.inStock) return;
 
     addToCart(product);
+    setJustAdded(true);
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+
+    resetTimer.current = setTimeout(() => {
+      setJustAdded(false);
+      resetTimer.current = null;
+    }, 2000);
   }
 
   return (
@@ -25,14 +39,22 @@ export default function AddToCartButton({
       disabled={!product.inStock}
       aria-label={
         product.inStock
-          ? `افزودن ${product.name} به سبد خرید`
+          ? justAdded
+            ? `${product.name} به سبد خرید اضافه شد؛ برای افزودن دوباره کلیک کنید`
+            : `افزودن ${product.name} به سبد خرید`
           : `${product.name} ناموجود است`
       }
-      className="w-full rounded-xl bg-slate-900 px-4 py-3 font-medium text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:hover:bg-slate-300"
+      className={`w-full rounded-xl px-5 py-3.5 font-bold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 ${
+        justAdded
+          ? "bg-green-700 hover:bg-green-800"
+          : "bg-orange-600 hover:bg-orange-700"
+      }`}
     >
       {product.inStock
-        ? "افزودن به سبد خرید"
-        : "فعلاً ناموجود"}
+        ? justAdded
+          ? "✓ به سبد اضافه شد"
+          : "افزودن به سبد خرید"
+        : "ناموجود"}
     </button>
   );
 }

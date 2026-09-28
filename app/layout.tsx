@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { CartProvider } from "@/components/cart/CartProvider";
+import CartStatus from "@/components/cart/CartStatus";
 import {Navbar} from "@/components/layout/Navbar";
 import "./globals.css";
 
@@ -20,15 +21,12 @@ export default function RootLayout({
       <body>
         <CartProvider>
           <Header />
-
+          <Navbar />
+            <CartStatus />
           {children}
-
           <Footer />
         </CartProvider>
       </body>
     </html>
   );
 }
-
-
-
