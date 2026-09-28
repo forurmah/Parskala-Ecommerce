@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# Parskala E-commerce
 
-First, run the development server:
+A modern Persian e-commerce application built with Next.js, TypeScript, and Tailwind CSS.
+
+## 🚧 Project Status
+
+Currently under active development.
+
+This project is being built step by step to practice production-level frontend architecture.
+
+## Tech Stack
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+
+## Current Features
+
+### Completed
+
+✅ Responsive homepage  
+✅ Product listing  
+✅ Product card component  
+✅ Type-safe product data  
+✅ Dynamic product pages  
+✅ Product details  
+✅ 404 handling  
+✅ Add to cart functionality  
+
+### In Progress
+
+🚧 Cart persistence  
+🚧 Authentication  
+🚧 Backend integration  
+
+## Screenshots
+
+Coming soon.
+
+## Future Improvements
+
+- User authentication
+- Database integration
+- Product management dashboard
+- Payment flow
+- Order history
+
+## Installation
+
+Clone the project:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+git clone YOUR_REPOSITORY_URL
