@@ -9,8 +9,25 @@ import { formatPrice } from "@/data/products";
 const FREE_SHIPPING_THRESHOLD = 2_000_000;
 
 export default function CartView() {
-  const { items, setQuantity, removeFromCart, clearCart, totalCount, totalPrice } =
-    useCart();
+  const {
+    hydrated,
+    items,
+    setQuantity,
+    removeFromCart,
+    clearCart,
+    totalCount,
+    totalPrice,
+  } = useCart();
+
+  if (!hydrated) {
+    return (
+      <div
+        aria-busy="true"
+        aria-label="در حال بارگذاری سبد خرید"
+        className="h-64 animate-pulse rounded-2xl border border-slate-200 bg-white"
+      />
+    );
+  }
 
   if (items.length === 0) {
     return (

@@ -19,6 +19,8 @@ import {
 export const MAX_QUANTITY = 10;
 
 type CartContextValue = {
+  // False during server render and hydration, before the saved cart is read.
+  hydrated: boolean;
   items: CartItem[];
   addToCart: (product: Product) => void;
   setQuantity: (productId: string, quantity: number) => void;
@@ -30,11 +32,18 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
+const noopSubscribe = () => () => {};
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const storedLines = useSyncExternalStore(
     subscribe,
     getSnapshot,
     getServerSnapshot,
+  );
+  const hydrated = useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
   );
 
   // Join saved IDs with the catalog; drop products that no longer exist.
@@ -96,6 +105,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   return (
     <CartContext.Provider
       value={{
+        hydrated,
         items,
         addToCart,
         setQuantity,
