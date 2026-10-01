@@ -1,4 +1,4 @@
-import type { Product } from "@/types/product";
+import type { Product, ProductCategory } from "@/types/product";
 export const products: Product[] = [
   {
     id:"electric-drill-01",
@@ -51,4 +51,46 @@ export function getProductById(id: string): Product | undefined {
 
 export function formatPrice(price: number): string {
   return `${new Intl.NumberFormat("fa-IR").format(price)} تومان`;
+}
+
+export const categoryLabels: Record<ProductCategory, string> = {
+  "power-tools": "ابزار برقی",
+  "hand-tools": "ابزار دستی",
+  "safety-equipment": "تجهیزات ایمنی",
+};
+
+export function isProductCategory(value: unknown): value is ProductCategory {
+  return typeof value === "string" && Object.hasOwn(categoryLabels, value);
+}
+
+// Make Persian search forgiving: Arabic ي/ك vs Persian ی/ک, half-spaces
+// (ZWNJ) vs normal spaces, extra whitespace and letter case.
+function normalizeSearchText(text: string): string {
+  return text
+    .replace(/[يى]/g, "ی")
+    .replace(/ك/g, "ک")
+    .replace(/\u200c/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+type ProductFilters = {
+  query?: string;
+  category?: ProductCategory;
+};
+
+export function filterProducts({ query, category }: ProductFilters): Product[] {
+  const words = normalizeSearchText(query ?? "")
+    .split(" ")
+    .filter(Boolean);
+
+  return products.filter((product) => {
+    if (category && product.category !== category) return false;
+
+    const haystack = normalizeSearchText(
+      `${product.name} ${product.description} ${categoryLabels[product.category]}`,
+    );
+    return words.every((word) => haystack.includes(word));
+  });
 }
