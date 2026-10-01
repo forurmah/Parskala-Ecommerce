@@ -4,9 +4,7 @@ import Link from "next/link";
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { MAX_QUANTITY, useCart } from "@/components/cart/CartProvider";
 import { formatPrice } from "@/data/products";
-
-// Matches the banner in the header.
-const FREE_SHIPPING_THRESHOLD = 2_000_000;
+import { FREE_SHIPPING_THRESHOLD, getShippingCost } from "@/data/shipping";
 
 export default function CartView() {
   const {
@@ -48,6 +46,8 @@ export default function CartView() {
   }
 
   const remainingForFreeShipping = FREE_SHIPPING_THRESHOLD - totalPrice;
+  const shipping = getShippingCost(totalPrice);
+  const hasUnavailable = items.some((item) => !item.product.inStock);
 
   return (
     <div className="grid gap-6 lg:grid-cols-3 lg:items-start">
@@ -148,13 +148,11 @@ export default function CartView() {
           </div>
           <div className="flex justify-between">
             <dt className="text-slate-600">هزینه ارسال</dt>
-            <dd>
-              {remainingForFreeShipping <= 0 ? "رایگان" : "محاسبه در مرحله بعد"}
-            </dd>
+            <dd>{shipping === 0 ? "رایگان" : formatPrice(shipping)}</dd>
           </div>
           <div className="flex justify-between border-t border-slate-200 pt-3 text-base font-bold">
             <dt>جمع کل</dt>
-            <dd>{formatPrice(totalPrice)}</dd>
+            <dd>{formatPrice(totalPrice + shipping)}</dd>
           </div>
         </dl>
 
@@ -165,13 +163,27 @@ export default function CartView() {
           </p>
         )}
 
-        <button
-          type="button"
-          disabled
-          className="mt-5 w-full rounded-xl bg-orange-600 px-5 py-3.5 font-bold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
-        >
-          ادامه فرایند خرید (به‌زودی)
-        </button>
+        {hasUnavailable ? (
+          <>
+            <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm leading-6 text-red-700">
+              برای ادامه، کالاهای ناموجود را از سبد حذف کنید.
+            </p>
+            <button
+              type="button"
+              disabled
+              className="mt-5 w-full cursor-not-allowed rounded-xl bg-slate-300 px-5 py-3.5 font-bold text-white"
+            >
+              ادامه فرایند خرید
+            </button>
+          </>
+        ) : (
+          <Link
+            href="/checkout"
+            className="mt-5 block w-full rounded-xl bg-orange-600 px-5 py-3.5 text-center font-bold text-white transition-colors hover:bg-orange-700"
+          >
+            ادامه فرایند خرید
+          </Link>
+        )}
       </aside>
     </div>
   );

@@ -32,6 +32,7 @@ This project is being built step by step to practice production-level frontend a
 ✅ Cart persistence (localStorage)  
 ✅ Product search (Persian-friendly)  
 ✅ Category filtering  
+✅ Checkout form with validation (demo, pay on delivery)  
 
 ### In Progress
 
