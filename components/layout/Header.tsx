@@ -4,8 +4,15 @@ import Link from "next/link";
 import { Search, ShoppingCart, UserRound } from "lucide-react";
 import { useCart } from "@/components/cart/CartProvider";
 
-export default function Header() {
+type HeaderProps = {
+  // Null when nobody is logged in.
+  userName: string | null;
+};
+
+export default function Header({ userName }: HeaderProps) {
   const { totalCount } = useCart();
+  const accountHref = userName ? "/account" : "/login";
+  const firstName = userName?.split(" ")[0];
 
   return (
     <header className="border-b border-zinc-200 bg-white">
@@ -23,13 +30,13 @@ export default function Header() {
           </Link>
 
           <div className="flex items-center gap-2 lg:hidden">
-            <button
-              type="button"
-              aria-label="ورود به حساب کاربری"
+            <Link
+              href={accountHref}
+              aria-label={userName ? "حساب کاربری" : "ورود به حساب کاربری"}
               className="rounded-xl border border-zinc-200 p-2 text-zinc-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
             >
               <UserRound size={20} aria-hidden="true" />
-            </button>
+            </Link>
 
             <Link
               href="/cart"
@@ -68,13 +75,13 @@ export default function Header() {
         </Form>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <button
-            type="button"
+          <Link
+            href={accountHref}
             className="flex h-12 items-center gap-2 rounded-xl border border-zinc-200 px-4 text-sm font-medium text-zinc-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
           >
             <UserRound size={20} aria-hidden="true" />
-            ورود | ثبت‌نام
-          </button>
+            {firstName ?? "ورود | ثبت‌نام"}
+          </Link>
 
           <Link
             href="/cart"
