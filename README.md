@@ -53,7 +53,34 @@ Coming soon.
 
 ## Installation
 
-Clone the project:
+Clone the project and install dependencies:
 
 ```bash
-git clone YOUR_REPOSITORY_URL
+git clone https://github.com/forurmah/Parskala-Ecommerce.git
+cd Parskala-Ecommerce
+npm install
+```
+
+Start the development server and open http://localhost:3000:
+
+```bash
+npm run dev
+```
+
+## Testing
+
+Tests use [Playwright](https://playwright.dev). The first time, download the test browser:
+
+```bash
+npx playwright install chromium
+```
+
+Then run the tests (this builds the app and starts it on port 3100):
+
+```bash
+npm test          # all tests, desktop and mobile
+npm run test:ui   # interactive mode, handy for debugging
+```
+
+- `tests/unit/` checks plain functions: product search and checkout validation
+- `tests/e2e/` drives a real browser: cart, search and filters, checkout
