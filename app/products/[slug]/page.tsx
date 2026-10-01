@@ -1,9 +1,10 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import AddToCartButton from "@/components/cart/AddToCartButton";
-import { products } from "@/data/products";
+import { getProductBySlug, products } from "@/data/products";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -11,11 +12,28 @@ type ProductPageProps = {
 
 const priceFormatter = new Intl.NumberFormat("fa-IR");
 
+// Build every product page at build time instead of on each request.
+export function generateStaticParams() {
+  return products.map((product) => ({ slug: product.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: ProductPageProps): Promise<Metadata> {
+  const product = getProductBySlug((await params).slug);
+  if (!product) return {};
+
+  return {
+    title: `${product.name} | پارس‌کالا`,
+    description: product.description,
+  };
+}
+
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
 
   // The URL contains the slug, not the product ID.
-  const product = products.find((item) => item.slug === slug);
+  const product = getProductBySlug(slug);
 
   if (!product) {
     notFound();
