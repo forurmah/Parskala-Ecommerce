@@ -30,6 +30,8 @@ This project is being built step by step to practice production-level frontend a
 ✅ Add to cart functionality  
 ✅ Cart page with quantity controls  
 ✅ Cart persistence (localStorage)  
+✅ Product search (Persian-friendly)  
+✅ Category filtering  
 
 ### In Progress
 

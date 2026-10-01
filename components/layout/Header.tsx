@@ -1,4 +1,5 @@
 "use client"
+import Form from "next/form";
 import Link from "next/link";
 import { Search, ShoppingCart, UserRound } from "lucide-react";
 import { useCart } from "@/components/cart/CartProvider";
@@ -44,27 +45,27 @@ export default function Header() {
           </div>
         </div>
 
-        <div className="relative flex-1">
+        <Form action="/products" role="search" className="relative flex-1">
           <label htmlFor="site-search" className="sr-only">
             جستجو در محصولات
           </label>
 
           <input
             id="site-search"
-            name="search"
+            name="q"
             type="search"
             placeholder="جستجو در میان محصولات..."
             className="h-12 w-full rounded-xl border border-zinc-200 bg-zinc-100 pr-4 pl-12 text-sm outline-none transition placeholder:text-zinc-500 focus:border-rose-500 focus:bg-white focus:ring-4 focus:ring-rose-100"
           />
 
           <button
-            type="button"
+            type="submit"
             aria-label="جستجو"
             className="absolute left-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-zinc-500 transition hover:bg-white hover:text-rose-600"
           >
             <Search size={20} aria-hidden="true" />
           </button>
-        </div>
+        </Form>
 
         <div className="hidden items-center gap-2 lg:flex">
           <button

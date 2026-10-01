@@ -18,7 +18,7 @@ export default function Hero() {
         </p>
 
         <Link
-          href="#products"
+          href="/products"
           className="mt-8 inline-block rounded-xl bg-rose-600 px-6 py-3 font-bold text-white transition hover:bg-rose-700"
         >
           مشاهده محصولات
