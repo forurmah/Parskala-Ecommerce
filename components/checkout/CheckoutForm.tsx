@@ -72,7 +72,7 @@ function focusFirstInvalid(form: HTMLFormElement, errors: CheckoutErrors) {
   return true;
 }
 
-export default function CheckoutForm() {
+export default function CheckoutForm({ defaultName }: { defaultName: string }) {
   const { hydrated, items, totalPrice, clearCart } = useCart();
   const router = useRouter();
   const [errors, setErrors] = useState<CheckoutErrors>({});
@@ -178,7 +178,14 @@ export default function CheckoutForm() {
 
         <div className="grid gap-5 sm:grid-cols-2">
           <Field name="fullName" label="نام و نام خانوادگی" error={errors.fullName}>
-            {(props) => <input {...props} type="text" autoComplete="name" />}
+            {(props) => (
+              <input
+                {...props}
+                type="text"
+                autoComplete="name"
+                defaultValue={defaultName}
+              />
+            )}
           </Field>
 
           <Field

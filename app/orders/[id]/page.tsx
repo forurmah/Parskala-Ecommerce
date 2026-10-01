@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CircleCheck } from "lucide-react";
 
+import { getCurrentUser } from "@/auth/session";
 import { getOrderWithItems } from "@/db/orders";
 import { formatPrice } from "@/data/products";
 import {
@@ -26,6 +27,13 @@ export default async function OrderPage({ params }: OrderPageProps) {
 
   const order = await getOrderWithItems(id);
   if (!order) notFound();
+
+  // Orders placed while logged in are private to that account. Answer
+  // 404 rather than 403 so we don't confirm the order exists.
+  if (order.userId) {
+    const user = await getCurrentUser();
+    if (user?.id !== order.userId) notFound();
+  }
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">

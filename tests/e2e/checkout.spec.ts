@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { cartLink, seedCart } from "./helpers";
+import { cartLink, fillValidForm, seedCart } from "./helpers";
 
 test("checkout with an empty cart points back to the shop", async ({ page }) => {
   await page.goto("/checkout");
@@ -17,14 +17,6 @@ test("an empty form shows every error and focuses the first field", async ({ pag
   await page.getByLabel("نام و نام خانوادگی").fill("سارا محمدی");
   await expect(page.locator("[aria-invalid=true]")).toHaveCount(4);
 });
-
-async function fillValidForm(page: import("@playwright/test").Page) {
-  await page.getByLabel("نام و نام خانوادگی").fill("سارا محمدی");
-  await page.getByLabel("شماره موبایل").fill("۰۹۱۲ ۳۴۵ ۶۷۸۹"); // Persian digits
-  await page.getByLabel("شهر").fill("اصفهان");
-  await page.getByLabel("کد پستی").fill("۸۱۳۶۷۴۵۶۹۱");
-  await page.getByLabel("نشانی کامل").fill("خیابان چهارباغ، کوچه ۱۲، پلاک ۵");
-}
 
 test("a valid order is saved, confirmed and the cart is emptied", async ({ page }) => {
   await seedCart(page, [{ productId: "safety-helmet-01", quantity: 2 }], "/cart");

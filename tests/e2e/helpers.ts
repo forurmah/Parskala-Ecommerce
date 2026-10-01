@@ -34,9 +34,19 @@ export async function signUp(page: Page, name = "سارا محمدی", next?: st
   await page.getByLabel("ایمیل").fill(email);
   await page.getByLabel("رمز عبور").fill(TEST_PASSWORD);
   await page.getByRole("button", { name: "ثبت‌نام" }).click();
+  // Wait for the redirect, i.e. until the session cookie is set.
+  await page.waitForURL((url) => url.pathname !== "/signup");
   return email;
 }
 
 export function accountLink(page: Page) {
   return page.locator('header a[href="/account"]:visible, header a[href="/login"]:visible');
+}
+
+export async function fillValidForm(page: Page) {
+  await page.getByLabel("نام و نام خانوادگی").fill("سارا محمدی");
+  await page.getByLabel("شماره موبایل").fill("۰۹۱۲ ۳۴۵ ۶۷۸۹"); // Persian digits
+  await page.getByLabel("شهر").fill("اصفهان");
+  await page.getByLabel("کد پستی").fill("۸۱۳۶۷۴۵۶۹۱");
+  await page.getByLabel("نشانی کامل").fill("خیابان چهارباغ، کوچه ۱۲، پلاک ۵");
 }

@@ -2,6 +2,7 @@
 // Server actions are public endpoints: never trust prices, totals or
 // stock from the browser. Only product IDs and quantities are accepted,
 // and everything else is recomputed from the catalog here.
+import { getCurrentUser } from "@/auth/session";
 import { createOrder } from "@/db/orders";
 import { MAX_QUANTITY } from "@/data/cart";
 import { getProductById } from "@/data/products";
@@ -93,8 +94,9 @@ export async function placeOrder(
   const shipping = getShippingCost(subtotal);
 
   try {
+    const user = await getCurrentUser();
     const orderId = await createOrder({
-      userId: null,
+      userId: user?.id ?? null,
       details,
       items,
       subtotal,
