@@ -9,14 +9,13 @@ import {
 import { getProductById } from "@/data/products";
 import type { CartItem } from "@/types/cart";
 import type { Product } from "@/types/product";
+import { MAX_QUANTITY } from "@/data/cart";
 import {
   getServerSnapshot,
   getSnapshot,
   subscribe,
   writeCart,
 } from "@/components/cart/cartStorage";
-
-export const MAX_QUANTITY = 10;
 
 type CartContextValue = {
   // False during server render and hydration, before the saved cart is read.

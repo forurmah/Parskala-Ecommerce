@@ -22,9 +22,11 @@ export default defineConfig({
       testIgnore: /unit\//,
     },
   ],
-  // Test the production build, like real visitors would see it.
+  // Test the production build, like real visitors would see it, against
+  // a fresh database that is separate from local.db.
   webServer: {
-    command: `npm run build && npm run start -- --port ${PORT}`,
+    command: `rm -f test.db && npm run db:migrate && npm run build && npm run start -- --port ${PORT}`,
+    env: { DATABASE_URL: "file:test.db" },
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

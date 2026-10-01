@@ -2,7 +2,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
-import { MAX_QUANTITY, useCart } from "@/components/cart/CartProvider";
+import { useCart } from "@/components/cart/CartProvider";
+import { MAX_QUANTITY } from "@/data/cart";
 import { formatPrice } from "@/data/products";
 import { FREE_SHIPPING_THRESHOLD, getShippingCost } from "@/data/shipping";
 

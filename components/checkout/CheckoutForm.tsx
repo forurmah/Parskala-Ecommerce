@@ -1,7 +1,10 @@
 "use client";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useState, useTransition, type FormEvent, type ReactNode } from "react";
 import Link from "next/link";
-import { CircleCheck, ShoppingCart } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ShoppingCart } from "lucide-react";
+
+import { placeOrder } from "@/actions/orders";
 
 import { useCart } from "@/components/cart/CartProvider";
 import {
@@ -10,15 +13,7 @@ import {
 } from "@/components/checkout/validation";
 import { formatPrice } from "@/data/products";
 import { getShippingCost } from "@/data/shipping";
-import type { CartItem } from "@/types/cart";
 import type { CheckoutDetails, CheckoutErrors } from "@/types/checkout";
-
-type PlacedOrder = {
-  number: string;
-  details: CheckoutDetails;
-  items: CartItem[];
-  total: number;
-};
 
 const inputClass =
   "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100 aria-invalid:border-red-500 aria-invalid:focus:ring-red-100";
@@ -68,13 +63,31 @@ function Field({ name, label, error, hint, children }: FieldProps) {
   );
 }
 
+function focusFirstInvalid(form: HTMLFormElement, errors: CheckoutErrors) {
+  const firstInvalid = Object.keys(errors)[0];
+  if (!firstInvalid) return false;
+
+  const field = form.elements.namedItem(firstInvalid);
+  if (field instanceof HTMLElement) field.focus();
+  return true;
+}
+
 export default function CheckoutForm() {
   const { hydrated, items, totalPrice, clearCart } = useCart();
+  const router = useRouter();
   const [errors, setErrors] = useState<CheckoutErrors>({});
-  const [placedOrder, setPlacedOrder] = useState<PlacedOrder | null>(null);
+  const [serverMessage, setServerMessage] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const [redirecting, setRedirecting] = useState(false);
 
-  if (placedOrder) {
-    return <OrderConfirmation order={placedOrder} />;
+  // Shown between a successful order and the confirmation page loading,
+  // so the emptied cart doesn't flash the "empty cart" message.
+  if (redirecting) {
+    return (
+      <p aria-live="polite" className="py-16 text-center text-slate-600">
+        سفارش ثبت شد؛ در حال انتقال…
+      </p>
+    );
   }
 
   if (!hydrated) {
@@ -108,28 +121,36 @@ export default function CheckoutForm() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (hasUnavailable) return;
+    if (hasUnavailable || isPending) return;
 
     const form = event.currentTarget;
     const details = readCheckoutForm(new FormData(form));
     const nextErrors = validateCheckout(details);
     setErrors(nextErrors);
+    setServerMessage(null);
 
-    const firstInvalid = Object.keys(nextErrors)[0];
-    if (firstInvalid) {
-      const field = form.elements.namedItem(firstInvalid);
-      if (field instanceof HTMLElement) field.focus();
-      return;
-    }
+    if (focusFirstInvalid(form, nextErrors)) return;
 
-    setPlacedOrder({
-      number: Date.now().toString().slice(-8),
-      details,
-      items,
-      total,
+    const lines = items.map(({ product, quantity }) => ({
+      productId: product.id,
+      quantity,
+    }));
+
+    startTransition(async () => {
+      // The server re-checks everything and computes the real total.
+      const result = await placeOrder(details, lines);
+
+      if (result.ok) {
+        setRedirecting(true);
+        clearCart();
+        router.push(`/orders/${result.orderId}`);
+        return;
+      }
+
+      setErrors(result.errors ?? {});
+      setServerMessage(result.message ?? null);
+      if (result.errors) focusFirstInvalid(form, result.errors);
     });
-    clearCart();
-    window.scrollTo({ top: 0 });
   }
 
   // Clear a field's error as soon as the user edits it.
@@ -267,72 +288,23 @@ export default function CheckoutForm() {
           </p>
         )}
 
+        {serverMessage && (
+          <p
+            role="alert"
+            className="mt-4 rounded-xl bg-red-50 p-3 text-sm leading-6 text-red-700"
+          >
+            {serverMessage}
+          </p>
+        )}
+
         <button
           type="submit"
-          disabled={hasUnavailable}
+          disabled={hasUnavailable || isPending}
           className="mt-5 w-full rounded-xl bg-orange-600 px-5 py-3.5 font-bold text-white transition-colors hover:bg-orange-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300"
         >
-          ثبت سفارش
+          {isPending ? "در حال ثبت سفارش…" : "ثبت سفارش"}
         </button>
       </aside>
     </form>
-  );
-}
-
-function OrderConfirmation({ order }: { order: PlacedOrder }) {
-  return (
-    <section
-      aria-live="polite"
-      className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 text-center sm:p-10"
-    >
-      <CircleCheck
-        size={56}
-        className="mx-auto text-green-600"
-        aria-hidden="true"
-      />
-      <h2 className="mt-4 text-2xl font-bold">سفارش شما ثبت شد</h2>
-      <p className="mt-2 text-slate-600">
-        شماره سفارش:{" "}
-        <span className="font-bold text-slate-900">
-          {order.number.replace(/\d/g, (digit) => "۰۱۲۳۴۵۶۷۸۹"[Number(digit)])}
-        </span>
-      </p>
-
-      <dl className="mt-8 space-y-3 rounded-xl bg-slate-50 p-5 text-right text-sm">
-        <div className="flex justify-between gap-4">
-          <dt className="text-slate-600">گیرنده</dt>
-          <dd>{order.details.fullName}</dd>
-        </div>
-        <div className="flex justify-between gap-4">
-          <dt className="shrink-0 text-slate-600">نشانی</dt>
-          <dd>
-            {order.details.city}، {order.details.address}
-          </dd>
-        </div>
-        <div className="flex justify-between gap-4">
-          <dt className="text-slate-600">تعداد کالاها</dt>
-          <dd>
-            {order.items
-              .reduce((sum, item) => sum + item.quantity, 0)
-              .toLocaleString("fa-IR")}
-          </dd>
-        </div>
-        <div className="flex justify-between gap-4 font-bold">
-          <dt>مبلغ (پرداخت در محل)</dt>
-          <dd>{formatPrice(order.total)}</dd>
-        </div>
-      </dl>
-
-      <p className="mt-6 text-xs text-slate-500">
-        این نسخه آزمایشی فروشگاه است و سفارش واقعاً ارسال نمی‌شود.
-      </p>
-
-      <Link
-        href="/products"
-        className="mt-6 inline-block rounded-xl bg-orange-600 px-6 py-3 font-bold text-white transition-colors hover:bg-orange-700"
-      >
-        ادامه خرید
-      </Link>
-    </section>
   );
 }
