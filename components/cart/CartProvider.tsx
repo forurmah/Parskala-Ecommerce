@@ -1,41 +1,110 @@
 "use client";
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
+import { getProductById } from "@/data/products";
+import type { CartItem } from "@/types/cart";
 import type { Product } from "@/types/product";
+import {
+  getServerSnapshot,
+  getSnapshot,
+  subscribe,
+  writeCart,
+} from "@/components/cart/cartStorage";
 
-type CartLine = { product: Product; quantity: number };
+export const MAX_QUANTITY = 10;
+
 type CartContextValue = {
-  items: CartLine[];
+  items: CartItem[];
   addToCart: (product: Product) => void;
+  setQuantity: (productId: string, quantity: number) => void;
+  removeFromCart: (productId: string) => void;
+  clearCart: () => void;
   totalCount: number;
+  totalPrice: number;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartLine[]>([]);
+  const storedLines = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
+
+  // Join saved IDs with the catalog; drop products that no longer exist.
+  const items = useMemo(
+    () =>
+      storedLines.flatMap((line): CartItem[] => {
+        const product = getProductById(line.productId);
+        return product ? [{ product, quantity: line.quantity }] : [];
+      }),
+    [storedLines],
+  );
 
   function addToCart(product: Product) {
     if (!product.inStock) return;
 
-    setItems((current) => {
-      const exists = current.some((item) => item.product.id === product.id);
+    const lines = getSnapshot();
+    const exists = lines.some((line) => line.productId === product.id);
 
-      if (exists) {
-        return current.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item,
-        );
-      }
-
-      return [...current, { product, quantity: 1 }];
-    });
+    writeCart(
+      exists
+        ? lines.map((line) =>
+            line.productId === product.id
+              ? { ...line, quantity: Math.min(line.quantity + 1, MAX_QUANTITY) }
+              : line,
+          )
+        : [...lines, { productId: product.id, quantity: 1 }],
+    );
   }
-  const totalCount = items.reduce((sum, line) => sum + line.quantity, 0);
 
+  function setQuantity(productId: string, quantity: number) {
+    if (quantity < 1) {
+      removeFromCart(productId);
+      return;
+    }
+
+    writeCart(
+      getSnapshot().map((line) =>
+        line.productId === productId
+          ? { ...line, quantity: Math.min(quantity, MAX_QUANTITY) }
+          : line,
+      ),
+    );
+  }
+
+  function removeFromCart(productId: string) {
+    writeCart(getSnapshot().filter((line) => line.productId !== productId));
+  }
+
+  function clearCart() {
+    writeCart([]);
+  }
+
+  const totalCount = items.reduce((sum, line) => sum + line.quantity, 0);
+  const totalPrice = items.reduce(
+    (sum, line) => sum + line.product.price * line.quantity,
+    0,
+  );
 
   return (
-    <CartContext.Provider value={{ items, addToCart, totalCount }}>
+    <CartContext.Provider
+      value={{
+        items,
+        addToCart,
+        setQuantity,
+        removeFromCart,
+        clearCart,
+        totalCount,
+        totalPrice,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

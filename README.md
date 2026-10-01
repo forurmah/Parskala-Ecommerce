@@ -28,10 +28,11 @@ This project is being built step by step to practice production-level frontend a
 ✅ Product details  
 ✅ 404 handling  
 ✅ Add to cart functionality  
+✅ Cart page with quantity controls  
+✅ Cart persistence (localStorage)  
 
 ### In Progress
 
-🚧 Cart persistence  
 🚧 Authentication  
 🚧 Backend integration  
 

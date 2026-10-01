@@ -30,8 +30,8 @@ export default function Header() {
               <UserRound size={20} aria-hidden="true" />
             </button>
 
-            <button
-              type="button"
+            <Link
+              href="/cart"
               aria-label="مشاهده سبد خرید"
               className="relative rounded-xl border border-zinc-200 p-2 text-zinc-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
             >
@@ -40,7 +40,7 @@ export default function Header() {
               <span className="absolute -left-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-600 px-1 text-xs text-white">
                 {totalCount.toLocaleString("fa-IR")}
               </span>
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -75,8 +75,8 @@ export default function Header() {
             ورود | ثبت‌نام
           </button>
 
-          <button
-            type="button"
+          <Link
+            href="/cart"
             aria-label="مشاهده سبد خرید"
             className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-rose-600 text-white transition hover:bg-rose-700"
           >
@@ -85,7 +85,7 @@ export default function Header() {
             <span className="absolute -left-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-zinc-900 px-1 text-xs text-white">
               {totalCount.toLocaleString("fa-IR")}
             </span>
-          </button>
+          </Link>
         </div>
       </div>
     </header>
