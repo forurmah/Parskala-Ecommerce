@@ -1,5 +1,5 @@
 import "server-only";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { orderItems, orders } from "@/db/schema";
 import type { CheckoutDetails } from "@/types/checkout";
@@ -43,5 +43,15 @@ export async function getOrderWithItems(id: string) {
   return db.query.orders.findFirst({
     where: eq(orders.id, id),
     with: { items: true },
+  });
+}
+
+// Newest first. Callers must pass the logged-in user's own ID.
+export async function getOrdersForUser(userId: string) {
+  return db.query.orders.findMany({
+    where: eq(orders.userId, userId),
+    orderBy: [desc(orders.createdAt)],
+    columns: { id: true, total: true, createdAt: true },
+    with: { items: { columns: { quantity: true } } },
   });
 }

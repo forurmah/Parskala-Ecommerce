@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { LogOut, Package } from "lucide-react";
 
 import { logout } from "@/actions/auth";
 import { getCurrentUser } from "@/auth/session";
@@ -31,6 +32,14 @@ export default async function AccountPage() {
               </dd>
             </div>
           </dl>
+
+          <Link
+            href="/account/orders"
+            className="mt-6 flex items-center gap-2 rounded-xl bg-slate-50 p-4 font-medium transition hover:bg-orange-50 hover:text-orange-700"
+          >
+            <Package size={20} aria-hidden="true" />
+            سفارش‌های من
+          </Link>
 
           <form action={logout} className="mt-6 border-t border-slate-200 pt-6">
             <button

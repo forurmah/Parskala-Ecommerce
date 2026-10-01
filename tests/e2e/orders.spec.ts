@@ -48,3 +48,27 @@ test("guest orders stay reachable by their link", async ({ page, browser }) => {
   expect((await other.goto(orderUrl))?.status()).toBe(200);
   await other.close();
 });
+
+test("order history lists the account's orders, newest first", async ({ page }) => {
+  await signUp(page);
+  await page.goto("/account/orders");
+  await expect(page.getByText("هنوز سفارشی ثبت نکرده‌اید")).toBeVisible();
+
+  const first = await placeOrder(page);
+  const second = await placeOrder(page);
+
+  await page.goto("/account");
+  await page.getByRole("link", { name: "سفارش‌های من" }).click();
+  const links = page.getByRole("main").getByRole("link", { name: /سفارش/ });
+  await expect(links).toHaveCount(2);
+  await expect(links.first()).toHaveAttribute("href", new URL(second).pathname);
+  await expect(links.last()).toHaveAttribute("href", new URL(first).pathname);
+
+  await links.first().click();
+  await expect(page.getByRole("heading", { name: "سفارش شما ثبت شد" })).toBeVisible();
+});
+
+test("order history requires login", async ({ page }) => {
+  await page.goto("/account/orders");
+  await expect(page).toHaveURL("/login?next=/account/orders");
+});
