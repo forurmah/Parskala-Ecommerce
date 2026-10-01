@@ -34,18 +34,13 @@ function productsUrl(query: string, category?: ProductCategory) {
   return search ? `/products?${search}` : "/products";
 }
 
-export async function generateMetadata({
-  searchParams,
-}: ProductsPageProps): Promise<Metadata> {
-  const { query, category } = await readFilters(searchParams);
-  const heading = category ? categoryLabels[category] : "همه محصولات";
-
-  return {
-    title: query
-      ? `جستجوی «${query}» | پارس‌کالا`
-      : `${heading} | پارس‌کالا`,
-  };
-}
+// One fixed title on purpose. With a title that depends on ?q= or
+// ?category=, Next.js 16.3 sometimes shows the title of a *prefetched*
+// /products link after client-side navigation (e.g. clicking "ابزار دستی"
+// showed "تجهیزات ایمنی" in the tab). The page content is unaffected.
+export const metadata: Metadata = {
+  title: "محصولات | پارس‌کالا",
+};
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const { query, category } = await readFilters(searchParams);
