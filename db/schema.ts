@@ -2,7 +2,7 @@ import { relations } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 const createdAt = () =>
-  integer("created_at", { mode: "timestamp" })
+  integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .$defaultFn(() => new Date());
 
