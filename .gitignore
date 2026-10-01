@@ -45,3 +45,10 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+!.env.example
+
+# local database
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
